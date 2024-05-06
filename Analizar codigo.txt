@@ -1,0 +1,49 @@
+import json
+import pandas as pd
+import ast
+import gzip
+from tqdm import tqdm
+
+# Creo la función para leer las líneas de cada dataset.
+def leer_datos(ruta, tipo='json'):
+    """
+    Esta función lee datos desde cada archivo de mi carpeta y los convierte en un DataFrame de pandas.
+
+    Args:
+        ruta (str): La ruta al archivo que se va a leer.
+        tipo (str, optional): El formato de los datos en el archivo. Puede ser 'json' o 'literal'. 
+                              Si es 'json', los datos se cargarán utilizando json.loads. 
+                              Si es 'literal', los datos se cargarán utilizando ast.literal_eval. 
+                              Por defecto es 'json'.
+
+    Returns:
+        pd.DataFrame: Un DataFrame de pandas que contiene los datos leídos del archivo.
+    """
+    filas = []  # Será la lista para almacenar cada fila de datos
+
+    # Abro el archivo en modo lectura con codificación utf-8
+    with gzip.open(ruta, 'rt', encoding='utf-8') as f:
+        # Leo cada línea del archivo
+        for line in tqdm(f.readlines(), desc=f"Leyendo {ruta}"):
+            # Si el tipo es 'json', carga los datos con json.loads
+            if tipo == 'json':
+                data = json.loads(line)
+            # Si el tipo es 'literal', carga los datos con ast.literal_eval
+            elif tipo == 'literal':
+                data = ast.literal_eval(line)
+            # Añado los datos a la lista de filas
+            filas.append(data)
+
+    # Convierto la lista de filas en un DataFrame de pandas y lo devuelve.
+    return pd.DataFrame(filas)
+
+# Determino la ruta de cada dataset.
+ruta_games = r'C:\Users\Esteban García\OneDrive\Escritorio\LABs\PI MLOps STEAM DTPT06 01\Datos\steam_games.json.gz'
+ruta_reviews = r'C:\Users\Esteban García\OneDrive\Escritorio\LABs\PI MLOps STEAM DTPT06 01\Datos\user_reviews.json.gz'
+ruta_items = r'C:\Users\Esteban García\OneDrive\Escritorio\LABs\PI MLOps STEAM DTPT06 01\Datos\users_items.json.gz'
+
+# Convierto en dataframe cada datasets
+df_steam_games = leer_datos(ruta_games, tipo='json')
+df_user_reviews = leer_datos(ruta_reviews, tipo='literal')
+df_users_items = leer_datos(ruta_items, tipo='literal')
+anda perfecto pero después quiero desanidar el df user_reviews la columna 'reviews' y me está dando tantos dolores de cabeza porque creo que no sé si es porque dice 'literal' el código de extracción de datos para crear los nuevos df ¿me explico?
